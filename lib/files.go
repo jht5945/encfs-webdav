@@ -10,17 +10,17 @@ import (
 )
 
 type Dir struct {
-	webdav.Dir
+	EncFsDir
 	noSniff bool
 }
 
 func (d Dir) Stat(ctx context.Context, name string) (os.FileInfo, error) {
 	// Skip wrapping if NoSniff is off
 	if !d.noSniff {
-		return d.Dir.Stat(ctx, name)
+		return d.EncFsDir.Stat(ctx, name)
 	}
 
-	info, err := d.Dir.Stat(ctx, name)
+	info, err := d.EncFsDir.Stat(ctx, name)
 	if err != nil {
 		return nil, err
 	}
@@ -31,10 +31,10 @@ func (d Dir) Stat(ctx context.Context, name string) (os.FileInfo, error) {
 func (d Dir) OpenFile(ctx context.Context, name string, flag int, perm os.FileMode) (webdav.File, error) {
 	// Skip wrapping if NoSniff is off
 	if !d.noSniff {
-		return d.Dir.OpenFile(ctx, name, flag, perm)
+		return d.EncFsDir.OpenFile(ctx, name, flag, perm)
 	}
 
-	file, err := d.Dir.OpenFile(ctx, name, flag, perm)
+	file, err := d.EncFsDir.OpenFile(ctx, name, flag, perm)
 	if err != nil {
 		return nil, err
 	}
