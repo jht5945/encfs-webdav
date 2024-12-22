@@ -2,6 +2,7 @@ package lib
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"os"
 	"path"
@@ -10,10 +11,12 @@ import (
 
 	"github.com/jht5945/encfs-afero/encfs"
 	"github.com/spf13/afero"
+	"go.uber.org/zap"
 	"golang.org/x/net/webdav"
 )
 
 const DEBUG_ENCRYPTION_KEY = "DEBUG_ENCRYPTION_KEY"
+const ENCRYPTION_FILE_NAME_IV = "ENCRYPTION_FILE_NAME_IV"
 
 // IMPORTANT: copied from golang.org/x/webdav with modification
 
@@ -26,12 +29,26 @@ func NewEncFsDir(baseDirectory string) EncFsDir {
 	var encryptionMasterKey *encfs.EncryptionMasterKey
 	if isOn(os.Getenv(DEBUG_ENCRYPTION_KEY)) {
 		encryptionMasterKey = encfs.NewEncryptionMasterKey(make([]byte, 32))
+		zap.L().Info("initialize", zap.String("masterKey", "DEBUG"))
 	} else {
 		var err error
 		encryptionMasterKey, err = encfs.GetCachedEncryptionMasterKey()
 		if err != nil {
 			panic(fmt.Sprintf("Initialize encryption master key failed: %v", err))
 		}
+		zap.L().Info("initialize", zap.String("masterKey", "kms"))
+	}
+
+	encryptionFileNameIvBase64 := os.Getenv(ENCRYPTION_FILE_NAME_IV)
+	if encryptionFileNameIvBase64 != "" {
+		encryptionFileNameIv, err := base64.StdEncoding.DecodeString(encryptionFileNameIvBase64)
+		if err != nil {
+			panic(fmt.Sprintf("Initialize encryption file name IV failed: %v", err))
+		}
+		zap.L().Info("initialize", zap.String("fileNameIv", encryptionFileNameIvBase64))
+		encryptionMasterKey.WithFileNameIv(encryptionFileNameIv)
+	} else {
+		zap.L().Info("initialize", zap.String("fileNameIv", "nil"))
 	}
 
 	encFs := encfs.NewEncFs(encryptionMasterKey)

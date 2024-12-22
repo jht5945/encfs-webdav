@@ -7,7 +7,7 @@ prefix: /
 debug: false
 noSniff: false
 behindProxy: false
-directory: .
+directory: __data__
 permissions: CRUD
 rules: []
 rulesBehavior: overwrite
