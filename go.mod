@@ -5,7 +5,7 @@ go 1.23
 require (
 	github.com/coreos/go-systemd/v22 v22.5.0
 	github.com/go-viper/mapstructure/v2 v2.2.1
-	github.com/jht5945/encfs-afero v0.0.0-20241222043226-c2668bc7bba6
+	github.com/jht5945/encfs-afero v0.0.0-20241222080859-9d42d50a46a6
 	github.com/rs/cors v1.11.1
 	github.com/spf13/afero v1.11.0
 	github.com/spf13/cobra v1.8.1

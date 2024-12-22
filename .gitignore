@@ -2,3 +2,4 @@ encfs-webdav-linux*
 dist/
 __data__/
 webdav
+vendor/
